@@ -1,0 +1,941 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# PROJECT TITLE GOES HERE\n",
+    "\n",
+    "## 2024-25 Group: X"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*This is the MN5813 Group Assignment from Group X.*\n",
+    "\n",
+    "- Student 1 ID\n",
+    "- Student 2 101115747\n",
+    "- ..."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Project summary"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This project examines significant patterns, trends and attributes of olympic athletes thru an exthensive historical dataset of olympics comprising over 260k records. The goal is to figure out how things like age, gender , nationality, season and event types affct how ell people do in the olympics. The dataset has information about the atheletes demographics, physical traits, competittion details, and medal results. We turned the raw dat into useful insights by using data cleaning, wranling, and absic statistical visualization methods.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Generative AI"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The project use a structured way of analyzing things.\n",
+    "To start the data is imported from the website compressed and turned into a dataframe that can be used to make the data better, the missing values , inconsistenceies and duplicate value are found and fixed. To help make detailed comparisons between atheletes, more variables are created such as a combined team noc comumn and BMI calculation."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Introduction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Add your introduction here [app. 200-300 words]\n",
+    "# Formulate project aim & set of objectives"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Setup"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Import necessary libraries"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Load data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "import requests \n",
+    "from zipfile import ZipFile\n",
+    "import io\n",
+    "\n",
+    "url = 'https://raw.githubusercontent.com/malavikakhaitan23/MN5813-Group-Project/main/athlete_events.csv.zip'\n",
+    "\n",
+    "retrived_url = requests.get(url)\n",
+    "zip_file = ZipFile(io.BytesIO(retrived_url.content))\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Convert into DataFrame"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv(zip_file.open('athlete_events.csv'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# SUGGESTION: Merge data from multiple files into a single DataFrame"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Display the first few rows and basic information about the DataFrame `df` you have created from `data_source`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "   ID                      Name Sex   Age  Height  Weight            Team  \\\n",
+      "0   1                 A Dijiang   M  24.0   180.0    80.0           China   \n",
+      "1   2                  A Lamusi   M  23.0   170.0    60.0           China   \n",
+      "2   3       Gunnar Nielsen Aaby   M  24.0     NaN     NaN         Denmark   \n",
+      "3   4      Edgar Lindenau Aabye   M  34.0     NaN     NaN  Denmark/Sweden   \n",
+      "4   5  Christine Jacoba Aaftink   F  21.0   185.0    82.0     Netherlands   \n",
+      "\n",
+      "   NOC        Games  Year  Season       City          Sport  \\\n",
+      "0  CHN  1992 Summer  1992  Summer  Barcelona     Basketball   \n",
+      "1  CHN  2012 Summer  2012  Summer     London           Judo   \n",
+      "2  DEN  1920 Summer  1920  Summer  Antwerpen       Football   \n",
+      "3  DEN  1900 Summer  1900  Summer      Paris     Tug-Of-War   \n",
+      "4  NED  1988 Winter  1988  Winter    Calgary  Speed Skating   \n",
+      "\n",
+      "                              Event Medal  \n",
+      "0       Basketball Men's Basketball   NaN  \n",
+      "1      Judo Men's Extra-Lightweight   NaN  \n",
+      "2           Football Men's Football   NaN  \n",
+      "3       Tug-Of-War Men's Tug-Of-War  Gold  \n",
+      "4  Speed Skating Women's 500 metres   NaN  \n"
+     ]
+    }
+   ],
+   "source": [
+    " print(df.head())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 271116 entries, 0 to 271115\n",
+      "Data columns (total 15 columns):\n",
+      " #   Column  Non-Null Count   Dtype  \n",
+      "---  ------  --------------   -----  \n",
+      " 0   ID      271116 non-null  int64  \n",
+      " 1   Name    271116 non-null  object \n",
+      " 2   Sex     271116 non-null  object \n",
+      " 3   Age     261642 non-null  float64\n",
+      " 4   Height  210945 non-null  float64\n",
+      " 5   Weight  208241 non-null  float64\n",
+      " 6   Team    271116 non-null  object \n",
+      " 7   NOC     271116 non-null  object \n",
+      " 8   Games   271116 non-null  object \n",
+      " 9   Year    271116 non-null  int64  \n",
+      " 10  Season  271116 non-null  object \n",
+      " 11  City    271116 non-null  object \n",
+      " 12  Sport   271116 non-null  object \n",
+      " 13  Event   271116 non-null  object \n",
+      " 14  Medal   39783 non-null   object \n",
+      "dtypes: float64(3), int64(2), object(10)\n",
+      "memory usage: 31.0+ MB\n",
+      "None\n"
+     ]
+    }
+   ],
+   "source": [
+    " print(df.info())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data management"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Data cleaning"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ID             0\n",
+       "Name           0\n",
+       "Sex            0\n",
+       "Age         9474\n",
+       "Height     60171\n",
+       "Weight     62875\n",
+       "Team           0\n",
+       "NOC            0\n",
+       "Games          0\n",
+       "Year           0\n",
+       "Season         0\n",
+       "City           0\n",
+       "Sport          0\n",
+       "Event          0\n",
+       "Medal     231333\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "Index: 269731 entries, 0 to 271115\n",
+      "Data columns (total 15 columns):\n",
+      " #   Column  Non-Null Count   Dtype  \n",
+      "---  ------  --------------   -----  \n",
+      " 0   ID      269731 non-null  object \n",
+      " 1   Name    269731 non-null  object \n",
+      " 2   Sex     269731 non-null  object \n",
+      " 3   Age     260416 non-null  float64\n",
+      " 4   Height  210917 non-null  float64\n",
+      " 5   Weight  208204 non-null  float64\n",
+      " 6   Team    269731 non-null  object \n",
+      " 7   NOC     269731 non-null  object \n",
+      " 8   Games   269731 non-null  object \n",
+      " 9   Year    269731 non-null  int64  \n",
+      " 10  Season  269731 non-null  object \n",
+      " 11  City    269731 non-null  object \n",
+      " 12  Sport   269731 non-null  object \n",
+      " 13  Event   269731 non-null  object \n",
+      " 14  Medal   39772 non-null   object \n",
+      "dtypes: float64(3), int64(1), object(11)\n",
+      "memory usage: 32.9+ MB\n",
+      "None\n"
+     ]
+    }
+   ],
+   "source": [
+    "df[\"ID\"]=df[\"ID\"].astype(str)\n",
+    "print(df.info())           "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Name</th>\n",
+       "      <th>Sex</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>Height</th>\n",
+       "      <th>Weight</th>\n",
+       "      <th>Team</th>\n",
+       "      <th>NOC</th>\n",
+       "      <th>Games</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Season</th>\n",
+       "      <th>City</th>\n",
+       "      <th>Sport</th>\n",
+       "      <th>Event</th>\n",
+       "      <th>Medal</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>A Dijiang</td>\n",
+       "      <td>M</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>180.0</td>\n",
+       "      <td>80.0</td>\n",
+       "      <td>China</td>\n",
+       "      <td>CHN</td>\n",
+       "      <td>1992 Summer</td>\n",
+       "      <td>1992</td>\n",
+       "      <td>Summer</td>\n",
+       "      <td>Barcelona</td>\n",
+       "      <td>Basketball</td>\n",
+       "      <td>Basketball Men's Basketball</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2</td>\n",
+       "      <td>A Lamusi</td>\n",
+       "      <td>M</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>170.0</td>\n",
+       "      <td>60.0</td>\n",
+       "      <td>China</td>\n",
+       "      <td>CHN</td>\n",
+       "      <td>2012 Summer</td>\n",
+       "      <td>2012</td>\n",
+       "      <td>Summer</td>\n",
+       "      <td>London</td>\n",
+       "      <td>Judo</td>\n",
+       "      <td>Judo Men's Extra-Lightweight</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>3</td>\n",
+       "      <td>Gunnar Nielsen Aaby</td>\n",
+       "      <td>M</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Denmark</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>1920 Summer</td>\n",
+       "      <td>1920</td>\n",
+       "      <td>Summer</td>\n",
+       "      <td>Antwerpen</td>\n",
+       "      <td>Football</td>\n",
+       "      <td>Football Men's Football</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>Edgar Lindenau Aabye</td>\n",
+       "      <td>M</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Denmark/Sweden</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>1900 Summer</td>\n",
+       "      <td>1900</td>\n",
+       "      <td>Summer</td>\n",
+       "      <td>Paris</td>\n",
+       "      <td>Tug-Of-War</td>\n",
+       "      <td>Tug-Of-War Men's Tug-Of-War</td>\n",
+       "      <td>Gold</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>5</td>\n",
+       "      <td>Christine Jacoba Aaftink</td>\n",
+       "      <td>F</td>\n",
+       "      <td>21.0</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>82.0</td>\n",
+       "      <td>Netherlands</td>\n",
+       "      <td>NED</td>\n",
+       "      <td>1988 Winter</td>\n",
+       "      <td>1988</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Calgary</td>\n",
+       "      <td>Speed Skating</td>\n",
+       "      <td>Speed Skating Women's 500 metres</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>271111</th>\n",
+       "      <td>135569</td>\n",
+       "      <td>Andrzej ya</td>\n",
+       "      <td>M</td>\n",
+       "      <td>29.0</td>\n",
+       "      <td>179.0</td>\n",
+       "      <td>89.0</td>\n",
+       "      <td>Poland-1</td>\n",
+       "      <td>POL</td>\n",
+       "      <td>1976 Winter</td>\n",
+       "      <td>1976</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Innsbruck</td>\n",
+       "      <td>Luge</td>\n",
+       "      <td>Luge Mixed (Men)'s Doubles</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>271112</th>\n",
+       "      <td>135570</td>\n",
+       "      <td>Piotr ya</td>\n",
+       "      <td>M</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>176.0</td>\n",
+       "      <td>59.0</td>\n",
+       "      <td>Poland</td>\n",
+       "      <td>POL</td>\n",
+       "      <td>2014 Winter</td>\n",
+       "      <td>2014</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Sochi</td>\n",
+       "      <td>Ski Jumping</td>\n",
+       "      <td>Ski Jumping Men's Large Hill, Individual</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>271113</th>\n",
+       "      <td>135570</td>\n",
+       "      <td>Piotr ya</td>\n",
+       "      <td>M</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>176.0</td>\n",
+       "      <td>59.0</td>\n",
+       "      <td>Poland</td>\n",
+       "      <td>POL</td>\n",
+       "      <td>2014 Winter</td>\n",
+       "      <td>2014</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Sochi</td>\n",
+       "      <td>Ski Jumping</td>\n",
+       "      <td>Ski Jumping Men's Large Hill, Team</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>271114</th>\n",
+       "      <td>135571</td>\n",
+       "      <td>Tomasz Ireneusz ya</td>\n",
+       "      <td>M</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>96.0</td>\n",
+       "      <td>Poland</td>\n",
+       "      <td>POL</td>\n",
+       "      <td>1998 Winter</td>\n",
+       "      <td>1998</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Nagano</td>\n",
+       "      <td>Bobsleigh</td>\n",
+       "      <td>Bobsleigh Men's Four</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>271115</th>\n",
+       "      <td>135571</td>\n",
+       "      <td>Tomasz Ireneusz ya</td>\n",
+       "      <td>M</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>96.0</td>\n",
+       "      <td>Poland</td>\n",
+       "      <td>POL</td>\n",
+       "      <td>2002 Winter</td>\n",
+       "      <td>2002</td>\n",
+       "      <td>Winter</td>\n",
+       "      <td>Salt Lake City</td>\n",
+       "      <td>Bobsleigh</td>\n",
+       "      <td>Bobsleigh Men's Four</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>269731 rows × 15 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            ID                      Name Sex   Age  Height  Weight  \\\n",
+       "0            1                 A Dijiang   M  24.0   180.0    80.0   \n",
+       "1            2                  A Lamusi   M  23.0   170.0    60.0   \n",
+       "2            3       Gunnar Nielsen Aaby   M  24.0     NaN     NaN   \n",
+       "3            4      Edgar Lindenau Aabye   M  34.0     NaN     NaN   \n",
+       "4            5  Christine Jacoba Aaftink   F  21.0   185.0    82.0   \n",
+       "...        ...                       ...  ..   ...     ...     ...   \n",
+       "271111  135569                Andrzej ya   M  29.0   179.0    89.0   \n",
+       "271112  135570                  Piotr ya   M  27.0   176.0    59.0   \n",
+       "271113  135570                  Piotr ya   M  27.0   176.0    59.0   \n",
+       "271114  135571        Tomasz Ireneusz ya   M  30.0   185.0    96.0   \n",
+       "271115  135571        Tomasz Ireneusz ya   M  34.0   185.0    96.0   \n",
+       "\n",
+       "                  Team  NOC        Games  Year  Season            City  \\\n",
+       "0                China  CHN  1992 Summer  1992  Summer       Barcelona   \n",
+       "1                China  CHN  2012 Summer  2012  Summer          London   \n",
+       "2              Denmark  DEN  1920 Summer  1920  Summer       Antwerpen   \n",
+       "3       Denmark/Sweden  DEN  1900 Summer  1900  Summer           Paris   \n",
+       "4          Netherlands  NED  1988 Winter  1988  Winter         Calgary   \n",
+       "...                ...  ...          ...   ...     ...             ...   \n",
+       "271111        Poland-1  POL  1976 Winter  1976  Winter       Innsbruck   \n",
+       "271112          Poland  POL  2014 Winter  2014  Winter           Sochi   \n",
+       "271113          Poland  POL  2014 Winter  2014  Winter           Sochi   \n",
+       "271114          Poland  POL  1998 Winter  1998  Winter          Nagano   \n",
+       "271115          Poland  POL  2002 Winter  2002  Winter  Salt Lake City   \n",
+       "\n",
+       "                Sport                                     Event Medal  \n",
+       "0          Basketball               Basketball Men's Basketball   NaN  \n",
+       "1                Judo              Judo Men's Extra-Lightweight   NaN  \n",
+       "2            Football                   Football Men's Football   NaN  \n",
+       "3          Tug-Of-War               Tug-Of-War Men's Tug-Of-War  Gold  \n",
+       "4       Speed Skating          Speed Skating Women's 500 metres   NaN  \n",
+       "...               ...                                       ...   ...  \n",
+       "271111           Luge                Luge Mixed (Men)'s Doubles   NaN  \n",
+       "271112    Ski Jumping  Ski Jumping Men's Large Hill, Individual   NaN  \n",
+       "271113    Ski Jumping        Ski Jumping Men's Large Hill, Team   NaN  \n",
+       "271114      Bobsleigh                      Bobsleigh Men's Four   NaN  \n",
+       "271115      Bobsleigh                      Bobsleigh Men's Four   NaN  \n",
+       "\n",
+       "[269731 rows x 15 columns]"
+      ]
+     },
+     "execution_count": 61,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.drop_duplicates()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Anything else?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Data wrangling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ID                      Name Sex   Age  Height  Weight            Team  NOC  \\\n",
+      "0  1                 A Dijiang   M  24.0   180.0    80.0           China  CHN   \n",
+      "1  2                  A Lamusi   M  23.0   170.0    60.0           China  CHN   \n",
+      "2  3       Gunnar Nielsen Aaby   M  24.0     NaN     NaN         Denmark  DEN   \n",
+      "3  4      Edgar Lindenau Aabye   M  34.0     NaN     NaN  Denmark/Sweden  DEN   \n",
+      "4  5  Christine Jacoba Aaftink   F  21.0   185.0    82.0     Netherlands  NED   \n",
+      "\n",
+      "         Games  Year  Season       City          Sport  \\\n",
+      "0  1992 Summer  1992  Summer  Barcelona     Basketball   \n",
+      "1  2012 Summer  2012  Summer     London           Judo   \n",
+      "2  1920 Summer  1920  Summer  Antwerpen       Football   \n",
+      "3  1900 Summer  1900  Summer      Paris     Tug-Of-War   \n",
+      "4  1988 Winter  1988  Winter    Calgary  Speed Skating   \n",
+      "\n",
+      "                              Event Medal        BMI         Team_and_NOC  \n",
+      "0       Basketball Men's Basketball   NaN  24.691358           China(CHN)  \n",
+      "1      Judo Men's Extra-Lightweight   NaN  20.761246           China(CHN)  \n",
+      "2           Football Men's Football   NaN        NaN         Denmark(DEN)  \n",
+      "3       Tug-Of-War Men's Tug-Of-War  Gold        NaN  Denmark/Sweden(DEN)  \n",
+      "4  Speed Skating Women's 500 metres   NaN  23.959094     Netherlands(NED)  \n"
+     ]
+    }
+   ],
+   "source": [
+    "df[\"Team_and_NOC\"]=df[\"Team\"]+\"(\"+df[\"NOC\"]+\")\"\n",
+    "print(df.head())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ID                      Name Sex   Age  Height  Weight            Team  NOC  \\\n",
+      "0  1                 A Dijiang   M  24.0   180.0    80.0           China  CHN   \n",
+      "1  2                  A Lamusi   M  23.0   170.0    60.0           China  CHN   \n",
+      "2  3       Gunnar Nielsen Aaby   M  24.0     NaN     NaN         Denmark  DEN   \n",
+      "3  4      Edgar Lindenau Aabye   M  34.0     NaN     NaN  Denmark/Sweden  DEN   \n",
+      "4  5  Christine Jacoba Aaftink   F  21.0   185.0    82.0     Netherlands  NED   \n",
+      "\n",
+      "         Games  Year  Season       City          Sport  \\\n",
+      "0  1992 Summer  1992  Summer  Barcelona     Basketball   \n",
+      "1  2012 Summer  2012  Summer     London           Judo   \n",
+      "2  1920 Summer  1920  Summer  Antwerpen       Football   \n",
+      "3  1900 Summer  1900  Summer      Paris     Tug-Of-War   \n",
+      "4  1988 Winter  1988  Winter    Calgary  Speed Skating   \n",
+      "\n",
+      "                              Event Medal        BMI         Team_and_NOC  \n",
+      "0       Basketball Men's Basketball   NaN  24.691358           China(CHN)  \n",
+      "1      Judo Men's Extra-Lightweight   NaN  20.761246           China(CHN)  \n",
+      "2           Football Men's Football   NaN        NaN         Denmark(DEN)  \n",
+      "3       Tug-Of-War Men's Tug-Of-War  Gold        NaN  Denmark/Sweden(DEN)  \n",
+      "4  Speed Skating Women's 500 metres   NaN  23.959094     Netherlands(NED)  \n"
+     ]
+    }
+   ],
+   "source": [
+    "df[\"BMI\"]=df[\"Weight\"]/(df[\"Height\"]/100)**2\n",
+    "print(df.head())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Anything else?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 77,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Conduct data analysis\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data visualisation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Create at least two meaningful visualisations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAA2QAAAIhCAYAAAAhCnmjAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAASGxJREFUeJzt3XtYVWX+///XFhQRYYsQbHfiqYwwTZMaRGvEPKCJ5NjkFEWZx76WRmqaWWnNJ03Lw4xOZo6nPNaUOJYNo2ZZjngIYxrNsaY8jiB+FDceCBDW748+rl9b8EToTfB8XNe+Ltd9v9da972dvaeX91prOyzLsgQAAAAAuOZqmB4AAAAAAFRXBDIAAAAAMIRABgAAAACGEMgAAAAAwBACGQAAAAAYQiADAAAAAEMIZAAAAABgCIEMAAAAAAwhkAEAAACAIQQyAKhGFi5cKIfDYb9q164tl8ulTp06adKkScrJySm1z4QJE+RwOK7oPGfOnNGECRP06aefXtF+ZZ2rSZMmSkhIuKLjXMqyZcs0Y8aMMvscDocmTJhQoeeraB9//LFuv/12BQQEyOFwaNWqVWXW7du3z/67vtCc+vfvb9dUpH79+qlJkybl2jcuLk5xcXEVOh4AqKwIZABQDS1YsEDp6elat26d/vSnP6lNmzaaPHmyoqKitH79eq/agQMHKj09/YqOf+bMGb300ktXHMjKc67yuFggS09P18CBA6/6GMrLsiz17dtXNWvW1OrVq5Wenq6OHTtedJ/AwEAtXLhQJSUlXu2nTp3SX/7yFwUFBV3NIQMALoJABgDVUMuWLdWuXTvddddduu+++zR9+nR99dVXCggIUJ8+fXTkyBG7tmHDhmrXrt1VHc+ZM2eu2bkupV27dmrYsKHRMVzM4cOHdfz4cf3mN79R586d1a5dOwUHB190n9/97nfav3+/Pv74Y6/2d955R8XFxUpMTLyaQwYAXASBDAAgSWrUqJGmTp2qkydPas6cOXZ7WZcRbtiwQXFxcQoJCZG/v78aNWqk++67T2fOnNG+fft03XXXSZJeeukl+3K4fv36eR1vx44d+u1vf6vg4GDdcMMNFzzXOampqbr11ltVu3ZtNWvWTH/84x+9+s9djrlv3z6v9k8//VQOh8NerYuLi9OaNWu0f/9+r8s3zynr8r6dO3fq3nvvVXBwsGrXrq02bdpo0aJFZZ5n+fLlGjdunNxut4KCgtSlSxft2bPnwm/8T2zatEmdO3dWYGCg6tSpo/bt22vNmjV2/4QJE+ywOGbMGDkcjsu6LDAyMlLt27fX/Pnzvdrnz5+vPn36yOl0lrnfO++8o9jYWAUEBKhu3bqKj4/Xl19+Wapu4cKFioyMlJ+fn6KiovT222+XebyXXnpJMTExql+/voKCgtS2bVvNmzdPlmVdcg6zZ89W69atVbduXQUGBurmm2/Wc889d8n9AKCyI5ABAGz33HOPfHx89Nlnn12wZt++ferZs6dq1aql+fPnKy0tTa+++qoCAgJUWFioBg0aKC0tTZI0YMAApaenKz09XS+88ILXcfr06aMbb7xRf/nLX/Tmm29edFyZmZlKSUnR008/rdTUVLVv315PPfWUXn/99Sue4xtvvKEOHTrI5XLZY7vYZZJ79uxR+/bttWvXLv3xj3/UypUr1aJFC/Xr109TpkwpVf/cc89p//79+vOf/6y33npL3377rXr16qXi4uKLjmvjxo26++675fF4NG/ePC1fvlyBgYHq1auX3nnnHUk/XtK5cuVKSdKwYcOUnp6u1NTUy5r3gAEDtGrVKuXm5trz2rx5swYMGFBm/cSJE/Xggw+qRYsWevfdd7V48WKdPHlSd911l77++mu7buHChXrssccUFRWl999/X88//7x+//vfa8OGDaWOuW/fPg0ZMkTvvvuuVq5cqT59+mjYsGH6/e9/f9Gxr1ixQkOHDlXHjh2VmpqqVatW6emnn9bp06cva+4AUKlZAIBqY8GCBZYka/v27ResCQ8Pt6Kiouzt8ePHWz/9v4v33nvPkmRlZmZe8BhHjx61JFnjx48v1XfueC+++OIF+36qcePGlsPhKHW+rl27WkFBQdbp06e95rZ3716vuk8++cSSZH3yySd2W8+ePa3GjRuXOfbzx/3AAw9Yfn5+1oEDB7zqevToYdWpU8c6ceKE13nuuecer7p3333XkmSlp6eXeb5z2rVrZ4WFhVknT560286ePWu1bNnSatiwoVVSUmJZlmXt3bvXkmS99tprFz3e+bUnT5606tata82aNcuyLMt65plnrKZNm1olJSXWE0884fW+HzhwwPL19bWGDRvmdbyTJ09aLpfL6tu3r2VZllVcXGy53W6rbdu29vgsy7L27dtn1axZ84Lv8bl9i4qK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tXLlSq/2kJAQKyAgwAoICLBGjx5trV271vLx8bEOHDhg1+zatcuSZG3bts2yLMsaP3681bp1a7u/QYMG1quvvmpvFxUVWQ0bNrTuvffeqzonAN4effRRy8fHx/5MS7IaNGhgZWRkWJZlWXv37rUkWTNmzPDaz+12W6+88opX2x133GENHTrUa78///nPdv+574Xdu3eXGse0adOsevXqWXv27LEsy7I+/vhjKygoyPrhhx+86m644QZrzpw5P3/iAC7pvffes4KDg63atWtb7du3t8aOHWv985//tPslWampqZZl/f+f+S+//NKyLMvasWOH5XA4rH379lmWZVnFxcXW9ddfb/3pT3+yLOvyPuPjx4+3atasaeXk5FzlmaIyYIUMuAiHw+G1vW3bNmVmZuqWW25RQUGBdu/erYiICEVERNg1LVq0UL169bR79+5Sx/N4PMrKylJsbKzd5uvrq9tvv/3qTQLABXXq1EmZmZnKzMzU1q1b1a1bN/Xo0UP79++3a376+czLy9Phw4fVoUMHr+N06NCh1Gf+1ltvtf/coEEDST8+KOCn/va3v+nZZ5/VO++8o5tuukmSlJGRoVOnTikkJMT+l/q6detq7969+u677ypm4gAu6r777tPhw4e1evVqxcfH69NPP1Xbtm21cOHCS+5722236eabb9by5cslSRs3blROTo769u0r6fI/440bN9Z11113VeaHyoWHegBluPHGG+VwOPTvf//bq71Zs2aSJH9/f0mSZVmlQtvF2gFULgEBAbrxxhvt7ejoaDmdTs2dO1cDBw60a853/ue7rM/8T2/AP9dXUlJit3399dd64IEH9Oqrr6pbt252e0lJiRo0aKBPP/201Hnr1at3+ZMD8LPUrl1bXbt2VdeuXfXiiy9q4MCBGj9+vPr163fJfR966CEtW7ZMzz77rJYtW6b4+HiFhoZKuvzP+IVumUDVwwoZUIaQkBB17dpVs2bN0unTpy9Y16JFCx04cEAHDx60277++mt5PB5FRUWVqnc6nWrQoIG2bNlit509e1YZGRkVOwEA5eJwOFSjRg3l5+eX2R8UFCS3261NmzZ5tW/evLnMz/yFHDt2TL169VKfPn309NNPe/W1bdtW2dnZ8vX11Y033uj1OvcfdACuvRYtWlz0vwl+KikpSf/617+UkZGh9957Tw899JDdx2cc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",
+      "text/plain": [
+       "<Figure size 1000x600 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "\n",
+    "plt.figure(figsize=(10, 6))\n",
+    "sns.countplot(x=\"Medal\", data=df)\n",
+    "plt.title(\"Distribution of Medals\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAA20AAAIhCAYAAADdH1JpAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAOetJREFUeJzt3XuY1XW99//XxGFADiOJzDCKpzCSwEowBEtEhdEEtdxpUlOkkTtNYgNq3G7TvMoDHnBvvbe7umtrpuF9Z1R3GoIkKCqKBBV5qG16i5sBPAyDHBxGWL8//LF2I2hK6HyTx+O61nWxvt/3WuszX69r5nr6/a61KkqlUikAAAAU0nvaegEAAAC8PtEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAAAABSbaAAAACky0AQAAFJhoAwAAKDDRBgBJHnrooXzyk5/MPvvsk8rKylRXV2fo0KGZPHlyWy8NgF1cRalUKrX1IgCgLd1xxx054YQTcuSRR2b8+PHp3bt3Ghoa8sgjj2TGjBl59tln23qJAOzCRBsAu7zhw4fnv/7rv/L444+nffv2rfZt2bIl73mPC1MAaDv+CgGwy3vhhRfSs2fPbYItyTbBdtttt2Xo0KHp0qVLunbtmrq6uixZsqTVzCOPPJLPfOYz2W+//dK5c+fst99+Oe200/L//t//azW3YcOGTJkyJfvvv386deqU9773vRk8eHB+/OMft5r7xS9+kaFDh2a33XZLt27dMnLkyDz44IOtZi6++OJUVFTkD3/4Q0477bRUVVWluro6p59+epqamv6WwwNAGxNtAOzyhg4dmoceeigTJkzIQw89lJaWlu3OXXrppTnttNPSv3///O///b9z880356WXXsrHP/7xPProo+W5p59+Ov369cu1116bu+66K1dccUUaGhpy6KGH5vnnny/PTZo0KTfccEMmTJiQWbNm5eabb86nP/3pvPDCC+WZW2+9NSeeeGK6d++eH//4x/n+97+fxsbGHHnkkVmwYME2azz55JPz/ve/P7fffnu+/vWv59Zbb80//dM/7cSjBcA7zeWRAOzyXnjhhZx00knlCOrQoUMOPfTQjBkzJl/96lfTtWvXLF++PAcccEC+8pWv5F//9V/Lj123bl0OPPDAHHHEEbntttu2+/ybN2/Oyy+/nOrq6lx66aWZMGFCkmTgwIHp27dvZs6cud3HbdmyJX369Mkee+yRpUuXls/6rVu3Lu973/vSt2/f3H///UlePdP2zW9+M9OmTcu5555bfo6zzz47P/jBD7Jhw4ZUVFT87QcLgHecM20A7PL22GOP3HfffVm0aFEuv/zynHjiifnjH/+YqVOnZuDAgXn++edz11135ZVXXsnnP//5vPLKK+Vbp06dMnz48MybN6/8fOvWrcv555+fvn37pn379mnfvn26du2a9evX57HHHivPffSjH82vfvWrfP3rX8+8efOycePGVut64oknsmLFitTX17e6TLNr1645+eSTs3DhwmzYsKHVY0444YRW9w8++OC8/PLLWb169U48YgC8k7a9eB8AdlGDBw/O4MGDkyQtLS05//zzM3369EybNi1VVVVJkkMPPXS7j/3LqBo7dmzmzp2bCy+8MIceemi6d++eioqKfOITn2gVZv/6r/+avffeO7fddluuuOKKdOrUKXV1dbnyyitz4IEHli+T7N279zavV1tbmy1btqSxsTG77bZbefsee+zRaq6ysjJJtglCAP5+iDYA2I4OHTrkoosuyvTp07Ns2bKceOKJSZKf/OQn2XfffV/3cU1NTfnlL3+Ziy66KF//+tfL25ubm/Piiy+2mu3SpUu++c1v5pvf/GZWrVpVPus2ZsyYPP744+UAa2ho2OZ1VqxYkfe85z3p0aPHzvhxASgw0QbALq+hoWG7Z7O2XspYW1uburq6tG/fPk8++WROPvnk132uioqKlEql8hmurf7X//pf2bx58+s+rrq6OuPGjctvf/vbXHvttdmwYUP69euXvfbaK7feemumTJlSfk/a+vXrc/vtt5c/URKAdzfRBsAur66uLnvvvXfGjBmTD3zgA9myZUuWLl2aq6++Ol27ds3Xvva17LfffrnkkktywQUX5M9//nOOPfbY9OjRI6tWrcrDDz9cPmvWvXv3HHHEEbnyyivTs2fP7Lfffpk/f36+//3vZ/fdd2/1ukOGDMno0aNz8MEHp0ePHnnsscdy8803t4qxadOm5bOf/WxGjx6dM888M83NzbnyyiuzZs2aXH755W1wtAB4p4k2AHZ5//zP/5yf//znmT59ehoaGtLc3JzevXvnmGOOydSpU3PQQQclSaZOnZr+/fvnX/7lX/LjH/84zc3NqampyaGHHpp//Md/LD/frbfemq99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AAAA8Bo79EEkAAAAvDNEGwAAQIGJNgAAgAITbQAAAAUm2gAAAApMtAEAABRYm0bbvffemzFjxqS2tjYVFRX52c9+1mp/qVTKxRdfnNra2nTu3DlHHnlk/vCHP7SaaW5uzjnnnJOePXumS5cuOeGEE/Lss8+2mmlsbEx9fX2qqqpSVVWV+vr6rFmzptXMM888kzFjxqRLly7p2bNnJkyYUP7i8K1+//vfZ/jw4encuXP22muvXHLJJSmVSjvteAAAALxWm0bb+vXr86EPfSjXX3/9dvdPmzYt11xzTa6//vosWrQoNTU1GTlyZF566aXyzMSJEzNz5szMmDEjCxYsyLp16zJ69Ohs3ry5PDN27NgsXbo0s2bNyqxZs7J06dLU19eX92/evDnHH3981q9fnwULFmTGjBm5/fbbM3ny5PLM2rVrM3LkyNTW1mbRokW57rrrctVVV+Waa655G44MAADAqypKBTlVVFFRkZkzZ+akk05K8upZttra2kycODHnn39+klfPqlVXV+eKK67ImWeemaampuy55565+eabc+qppyZJVqxYkT59+uTOO+9MXV1dHnvssfTv3z8LFy7MkCFDkiQLFy7M0KFD8/jjj6dfv3751a9+ldGjR2f58uWpra1NksyYMSPjxo3L6tWr071799xwww2ZOnVqVq1alcrKyiTJ5Zdfnuuuuy7PPvtsKioq3tTPuXbt2lRVVaWpqSndu3ffmYfwbzbo3B+29RIAdqrFV36+rZcAAK/rzbZBYd/T9tRTT2XlypUZNWpUeVtlZWWGDx+eBx54IEmyePHitLS0tJqpra3NgAEDyjMPPvhgqqqqysGWJIcddliqqqpazQwYMKAcbElSV1eX5ubmLF68uDwzfPjwcrBtnVmxYkWefvrp1/05mpubs3bt2lY3AACAN6uw0bZy5cokSXV1davt1dXV5X0rV65Mx44d06NHjzec6dWr1zbP36tXr1Yzr32dHj16pGPHjm84s/X+1pntueyyy8rvpauqqkqfPn3e+AcHAAD4C4WNtq1ee9lhqVT6q5civnZme/M7Y2brlaVvtJ6pU6emqampfFu+fPkbrh0AAOAvFTbaampqkmx7Fmv16tXlM1w1NTXZtGlTGhsb33Bm1apV2zz/c88912rmta/T2NiYlpaWN5xZvXp1km3PBv6lysrKdO/evdUNAADgzSpstO2///6pqanJnDlzyts2bdqU+fPnZ9iwYUmSQYMGpUOHDq1mGhoasmzZsvLM0KFD09TUlIcffrg889BDD6WpqanVzLJly9LQ0FCemT17diorKzNo0KDyzL333tvqawBmz56d2tra7Lfffjv/AAAAAKSNo23dunVZunRpli5dmuTVDx9ZunRpnnnmmVRUVGTixIm59NJLM3PmzCxbtizjxo3LbrvtlrFjxyZJqqqqcsYZZ2Ty5MmZO3dulixZks997nMZOHBgjjnmmCTJQQcdlGOPPTbjx4/PwoULs3DhwowfPz6jR49Ov379kiSjRo1K//79U19fnyVLlmTu3LmZMmVKxo8fXz4zNnbs2FRWVmbcuHFZtmxZZs6cmUsvvTSTJk16058cCQAA8Fa1b8sXf+SRRzJixIjy/UmTJiVJvvCFL+TGG2/Meeedl40bN+ass85KY2NjhgwZktmzZ6dbt27lx0yfPj3t27fPKaecko0bN+boo4/OjTfemHbt2pVnbrnllkyYMKH8KZMnnHBCq++Ga9euXe64446cddZZOfzww9O5c+eMHTs2V111VXmmqqoqc+bMydlnn53BgwenR48emTRpUnnNAAAAb4fCfE/brsL3tAG8c3xPGwBF9nf/PW0AAACINgAAgEITbQAAAAUm2gAAAApMtAEAABSYaAMAACgw0QYAAFBgog0AAKDARBsAAECBiTYAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAAAABSbaAAAACky0AQAAFJhoAwAAKDDRBgAAUGCiDQAAoMBEGwAAQIGJNgAAgAITbQAAAAUm2gAAAApMtAEAABSYaAMAACgw0QYAAFBgog0AAKDARBsAAECBiTYAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAAAABSbaAAAACky0AQAAFJhoAwAAKDDRBgAAUGCiDQAAoMBEGwAAQIGJNgAAgAITbQAAAAUm2gAAAApMtAEAABSYaAMAACgw0QYAAFBgog0AAKDARBsAAECBiTYAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAAAABSbaAAAACky0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AhNtAAAABSbaAAAACky0AQAAFJhoAwAAKDDRBgAAUGCiDQAAoMBEGwAAQIGJNgAAgAITbQAAAAUm2gAAAApMtAEAABSYaAMAACgw0QYAAFBgog0AAKDARBsAAECBiTYAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAAAABSbaAAAACky07YB/+7d/y/77759OnTpl0KBBue+++9p6SQAAwLuUaHuLbrvttkycODEXXHBBlixZko9//OM57rjj8swzz7T10gAAgHch0fYWXXPNNTnjjDPypS99KQcddFCuvfba9OnTJzfccENbLw0AAHgXat/WC/h7smnTpixevDhf//rXW20fNWpUHnjgge0+prm5Oc3NzeX7TU1NSZK1a9e+fQvdQZubN7b1EgB2qiL+rv174O8B8G5T1L8HW9dVKpXecE60vQXPP/98Nm/enOrq6lbbq6urs3Llyu0+5rLLLss3v/nNbbb36dPnbVkjAP+t6rp/bOslAFAARf978NJLL6Wqqup194u2HVBRUdHqfqlU2mbbVlOnTs2kSZPK97ds2ZIXX3wxe+yxx+s+Bt7N1q5dmz59+mT58uXp3r17Wy8HgDbi7wG82hEvvfRSamtr33BOtL0FPXv2TLt27bY5q7Z69eptzr5tVVlZmcrKylbbdt9997drifB3o3v37v5IA+DvAbu8NzrDtpUPInkLOnbsmEGDBmXOnDmtts+ZMyfDhg1ro1UBAADvZs60vUWTJk1KfX19Bg8enKFDh+a73/1unnnmmfzjPxb7OlkAAODvk2h7i0499dS88MILueSSS9LQ0JABAwbkzjvvzL777tvWS4O/C5WVlbnooou2uWwYgF2Lvwfw5lWU/trnSwIAANBmvKcNAACgwEQbAABAgYk2AACAAhNtAADsVPPmzUtFRUXWrFnT1kuBdwXRBiR59UvizzzzzOyzzz6prKxMTU1N6urq8uCDD7b10gBoQ//+7/+ebt265ZVXXilvW7duXTp06JCPf/zjrWbvu+++VFRUpLa2Ng0NDW/qS4O3GjduXE466aSdtWx4V/GR/0CS5OSTT05LS0tuuummHHDAAVm1alXmzp2bF198sa2XtlNs2rQpHTt2bOtlAPzdGTFiRNatW5dHHnkkhx12WJJX46ympiaLFi3Khg0bsttuuyV59QxbbW1t3v/+97fZev2+593ImTYga9asyYIFC3LFFVdkxIgR2XffffPRj340U6dOzfHHH5+nn346FRUVWbp0aavHVFRUZN68eUn++1KYu+66Kx/5yEfSuXPnHHXUUVm9enV+9atf5aCDDkr37t1z2mmnZcOGDeXnOfLII3POOedk4sSJ6dGjR6qrq/Pd734369evzxe/+MV069Yt73vf+/KrX/2q1ZofffTRfOITn0jXrl1TXV2d+vr6PP/8862e96tf/WomTZqUnj17ZuTIkW/rMQR4t+rXr19qa2vLv++TV3/nn3jiiXnf+96XBx54oNX2ESNGbHN55I033pjdd989d911Vw466KB07do1xx57bBoaGpIkF198cW666ab8/Oc/T0VFRau/L//1X/+VU089NT169Mgee+yRE088MU8//XT5NbeeobvsssvaPBjh7SLagHTt2jVdu3bNz372szQ3N/9Nz3XxxRfn+uuvzwMPPJDly5fnlFNOybXXXptbb701d9xxR+bMmZPrrruu1WNuuumm9OzZMw8//HDOOeecfOUrX8mnP/3pDBs2LL/5zW9SV1eX+vr6cuw1NDRk+PDh+fCHP5xHHnkks2bNyqpVq3LKKads87zt27fP/fffn+985zt/088FsCs78sgjc88995Tv33PPPTnyyCMzfPjw8vZNmzblwQcfzIgRI7b7HBs2bMhVV12Vm2++Offee2+eeeaZTJkyJUkyZcqUnHLKKeWQa2hoyLBhw7Jhw4aMGDEiXbt2zb333psFCxaUg2/Tpk3l5547d24ee+yxzJkzJ7/85S/fxiMBbaQEUCqVfvKTn5R69OhR6tSpU2nYsGGlqVOnln7729+WSqVS6amnniolKS1ZsqQ839jYWEpSuueee0qlUql0zz33lJKU7r777vLMZZddVkpSevLJJ8vbzjzzzFJdXV35/vDhw0sf+9jHyvdfeeWVUpcuXUr19fXlbQ0NDaUkpQcffLBUKpVKF154YWnUqFGt1r98+fJSktITTzxRft4Pf/jDf+NRAaBUKpW++93vlrp06VJqaWkprV27ttS+ffvSqlWrSjNmzCgNGzasVCqVSvPnzy//zt/6N6GxsbFUKpVK//Ef/1FKUvrP//zP8nP+z//5P0vV1dXl+1/4whdKJ554YqvX/f73v1/q169facuWLeVtzc3Npc6dO5fuuuuu8uOqq6tLzc3Nb9NPD23PmTYgyavvaVuxYkV+8YtfpK6uLvPmzcshhxySG2+88S09z8EHH1z+d3V1dXbbbbcccMABrbatXr36dR/Trl277LHHHhk4cGCrxyQpP27x4sW55557ymcIu3btmg984ANJkieffLL8uMGDB7+ltQOwfSNGjMj69euzaNGi3HfffXn/+9+fXr16Zfjw4Vm0aFHWr1+fefPmZZ999mn1O/8v7bbbbnnf+95Xvt+7d+9t/h681uLFi/Of//mf6datW/n3/Xvf+968/PLLrX7fDxw40PvYeFfzQSRAWadOnTJy5MiMHDky3/jGN/KlL30pF110Ue67774kSalUKs+2tLRs9zk6dOhQ/ndFRUWr+1u3bdmy5XUfs73HVVRUJEn5cVu2bMmYMWNyxRVXbPP6vXv3Lv+7S5cur//DAvCm9e3bN3vvvXfuueeeNDY2Zvjw4UmSmpqa7L///rn//vtzzz335Kijjnrd59je7/q//LuyPVu2bMmgQYNyyy23bLNvzz33LP/b73ve7UQb8Lr69++fn/3sZ+U/jA0NDfnIRz6SJK0+lOSddsghh+T222/Pfvvtl/bt/RoDeCds/YCRxsbGnHvuueXtw4cPz1133ZWFCxfmi1/84g4/f8eOHbN58+ZW2w455JDcdttt6dWrV7p3777Dzw1/71weCeSFF17IUUcdlR/96Ef53e9+l6eeeir/5//8n0ybNi0nnnhiOnfunMMOOyyXX355Hn300dx7773553/+5zZb79lnn50XX3wxp512Wh5++OH8+c9/zuzZs3P66adv8wcfgJ1jxIgRWbBgQZYuXVo+05a8Gm3f+9738vLLL7/uh5C8Gfvtt19+97vf5Yknnsjzzz+flpaWfPazn03Pnj1z4okn5r777stTTz2V+fPn52tf+1qeffbZnfFjwd8F0Qaka9euGTJkSKZPn54jjjgiAwYMyIUXXpjx48fn+uuvT5L84Ac/SEtLSwYPHpyvfe1r+da3vtVm662trc3999+fzZs3p66uLgMGDMjXvva1VFVV5T3v8WsN4O0wYsSIbNy4MX379i2/1zh5NdpeeumlvO9970ufPn12+PnHjx+ffv36ZfDgwdlzzz1z//33Z7fddsu9996bffbZJ5/61Kdy0EEH5fTTT8/GjRudeWOXUlH6axcTAwAA0Gb8L2kAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwEQbAABAgYk2AACAAhNtAPA6Vq9enTPPPDP77LNPKisrU1NTk7q6ujz44INtvTQAdiHt23oBAFBUJ598clpaWnLTTTflgAMOyKpVqzJ37ty8+OKLbb00AHYhzrQBwHasWbMmCxYsyBVXXJERI0Zk3333zUc/+tFMnTo1xx9/fJKkqakpX/7yl9OrV6907949Rx11VH7729+Wn+PJJ5/MiSeemOrq6nTt2jWHHnpo7r777lav82//9m858MAD06lTp1RXV+cf/uEfyvuam5szYcKE9OrVK506dcrHPvaxLFq0qLx/3rx5qaioyNy5czN48ODstttuGTZsWJ544om3+egA8E4SbQCwHV27dk3Xrl3zs5/9LM3NzdvsL5VKOf7447Ny5crceeedWbx4cQ455JAcffTR5TNx69atyyc+8YncfffdWbJkSerq6jJmzJg888wzSZJHHnkkEyZMyCWXXJInnngis2bNyhFHHFF+jfPOOy+33357brrppvzmN79J3759U1dXt82ZvgsuuCBXX311HnnkkbRv3z6nn37623hkAHinVZRKpVJbLwIAiuj222/P+PHjs3HjxhxyyCEZPnx4PvOZz+Tggw/Or3/963zyk5/M6tWrU1lZWX5M3759c9555+XLX/7ydp/zgx/8YL7yla/kq1/9an7605/mi1/8Yp599tl069at1dz69evTo0eP3HjjjRk7dmySpKWlJfvtt18mTpyYc889N/PmzcuIESNy99135+ijj06S3HnnnTn++OOzcePGdOrU6W06MgC8k5xpA4DXcfLJJ2fFihX5xS9+kbq6usybNy+HHHJIbrzxxixevDjr1q3LHnvsUT4r17Vr1zz11FN58sknk7waXuedd1769++f3XffPV27ds3jjz9ePtM2cuTI7LvvvjnggANSX1+fW265JRs2bEjy6qWVLS0tOfzww8vr6dChQz760Y/msccea7XOgw8+uPzv3r17J3n1Q1QAeHfwQSQA8AY6deqUkSNHZuTIkfnGN76RL33pS7noooty1llnpXfv3pk3b942j9l9992TJOeee27uuuuuXHXVVenbt286d+6cf/iHf8imTZuSJN26dctvfvObzJs3L7Nnz843vvGNXHzxxVm0aFG2XghTUVHR6rlLpdI22zp06FD+99Z9W7Zs2VmHAIA25kwbALwF/fv3z/r163PIIYdk5cqVad++ffr27dvq1rNnzyTJfffdl3HjxuWTn/xkBg4cmJqamjz99NOtnq99+/Y55phjMm3atPzud7/L008/nV//+tfp27dvOnbsmAULFpRnW1pa8sgjj+Sggw56J39kANqYM20AsB0vvPBCPv3pT+f000/PwQcfnG7duuWRRx7JtGnTcuKJJ+aYY47J0KFDc9JJJ+WKK65Iv379smLFitx555056aSTMnjw4PTt2zc//elPM2bMmFRUVOTCCy9sdQbsl7/8Zf785z/niCOOSI8ePXLnnXdmy5Yt6devX7p06ZKvfOUrOffcc/Pe9743++yzT6ZNm5YNGzbkjDPOaMMjA8A7TbQBwHZ07do1Q4YMyfTp08vvL+vTp0/Gjx+f//E//kcqKipy55135oILLsjpp5+e5557LjU1NTniiCNSXV2dJJk+fXpOP/30DBs2LD179sz555+ftWvXll9j9913z09/+tNcfPHFefnll3PggQfmxz/+cT74wQ8mSS6//PJs2bIl9fX1eemllzJ48ODcdddd6dGjR5scEwDahk+PBAAAKDDvaQMAACgw0QYAAFBgog0AAKDARBsAAECBiTYAAIACE20AAAAFJtoAAAAKTLQBAAAUmGgDAAAoMNEGAABQYKINAACgwP4/U+/ZDApJMmEAAAAASUVORK5CYII=",
+      "text/plain": [
+       "<Figure size 1000x600 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.figure(figsize=(10, 6))\n",
+    "sns.countplot(x=\"Season\", data=df)\n",
+    "plt.title(\"Season\")\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# SUGGESTION: Use a small multiple"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data export"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.to_csv(\"athlete_events.csv\",index=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Ensure that you can successfully load the exported CSV file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# TODO: Export visualizations as image files"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Conclusion"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Add your conclusion here [app. 300-500 words]."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## References"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "1. Reference 1\n",
+    "2. Reference 2\n",
+    "3. Reference 3\n",
+    "4. ...\n",
+    "\n",
+    "*(References must be complete and contain a link to the original source; usually a DOI link.)*"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Appendices"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Appendix A"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Appendix A goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Appendix B"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Appendix B goes here"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
